@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grade 7 Physics Quiz - Kinematics, Heat, Measurement & Light</title>
+<style>
+:root {
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+  --success: #16a34a;
+  --danger: #dc2626;
+  --warning: #ea580c;
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --text: #1e293b;
+  --muted: #64748b;
+  --border: #e2e8f0;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  color: var(--text);
+  padding: 1rem;
+}
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  background: var(--card);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  overflow: hidden;
+}
+header {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  padding: 1.5rem 2rem;
+  text-align: center;
+}
+header h1 { font-size: 1.75rem; margin-bottom: 0.25rem; }
+header p { opacity: 0.9; font-size: 0.95rem; }
+.screen { display: none; padding: 2rem; }
+.screen.active { display: block; }
+.instructions { background: #f1f5f9; border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; line-height: 1.6; }
+.instructions ul { margin-left: 1.25rem; margin-top: 0.5rem; }
+.btn {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+.btn-primary { background: var(--primary); color: white; }
+.btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+.btn-secondary { background: #e2e8f0; color: var(--text); }
+.btn-secondary:hover { background: #cbd5e1; }
+.btn-success { background: var(--success); color: white; }
+.btn-danger { background: var(--danger); color: white; }
+.progress-bar {
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  margin: 1rem 0;
+  overflow: hidden;
+}
+.progress-fill { height: 100%; background: var(--primary); transition: width 0.3s; }
+.timer-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  background: #fef3c7;
+  border-radius: 8px;
+  font-weight: 600;
+}
+.timer { font-size: 1.25rem; color: var(--warning); }
+.timer.warning { color: var(--danger); animation: pulse 0.5s infinite; }
+@keyframes pulse { 50% { opacity: 0.7; } }
+.question-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+.topic-badge { background: #dbeafe; color: var(--primary); padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; }
+.question-text { font-size: 1.15rem; font-weight: 500; margin: 1rem 0; line-height: 1.5; }
+.options { display: flex; flex-direction: column; gap: 0.75rem; margin: 1.5rem 0; }
+.option {
+  padding: 1rem 1.25rem;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: white;
+  text-align: left;
+  font-size: 1rem;
+}
+.option:hover { border-color: var(--primary); background: #eff6ff; }
+.option.selected { border-color: var(--primary); background: #dbeafe; }
+.option.correct { border-color: var(--success); background: #dcfce7; }
+.option.incorrect { border-color: var(--danger); background: #fee2e2; }
+.nav-buttons { display: flex; gap: 0.75rem; justify-content: space-between; margin-top: 1.5rem; flex-wrap: wrap; }
+.question-nav {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+  gap: 0.4rem;
+  margin: 1.5rem 0;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 0.5rem;
+  background: #f8fafc;
+  border-radius: 10px;
+}
+.q-btn {
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.q-btn:hover { border-color: var(--primary); }
+.q-btn.current { border-color: var(--primary); background: var(--primary); color: white; }
+.q-btn.answered { border-color: var(--success); background: #dcfce7; }
+.q-btn.skipped { border-color: var(--warning); background: #ffedd5; }
+.result-summary { text-align: center; padding: 1rem; }
+.score-circle {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: conic-gradient(var(--success) calc(var(--score) * 1%), #e2e8f0 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 1rem auto;
+  position: relative;
+}
+.score-circle::before {
+  content: '';
+  width: 110px;
+  height: 110px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+}
+.score-text { position: relative; font-size: 1.75rem; font-weight: 700; color: var(--success); }
+.review-item { margin: 1rem 0; padding: 1rem; border: 1px solid var(--border); border-radius: 10px; }
+.review-item.correct { border-left: 4px solid var(--success); }
+.review-item.incorrect { border-left: 4px solid var(--danger); }
+footer { text-align: center; padding: 1rem; color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--border); }
+@media (max-width: 600px) {
+  .container { margin: 0.5rem; }
+  header, .screen { padding: 1.25rem; }
+  .question-nav { grid-template-columns: repeat(8, 1fr); }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Grade 7 Physics Foundation Quiz</h1>
+    <p>Kinematics • Heat • Measurement • Light | JEE & NEET Foundation</p>
+  </header>
+
+  <!-- Start Screen -->
+  <div id="startScreen" class="screen active">
+    <div class="instructions">
+      <h3>Instructions</h3>
+      <ul>
+        <li>50 Multiple Choice Questions covering Measurement, Kinematics, Heat, and Light.</li>
+        <li>Each question has a <strong>60-second timer</strong>. Time up automatically moves to the next question (unanswered counted as incorrect).</li>
+        <li>You can navigate to any question using the question palette at any time.</li>
+        <li>Select an option and click Next, or jump directly to another question.</li>
+        <li>Based on Class 7 foundation preparation material for JEE & NEET.</li>
+      </ul>
+    </div>
+    <div style="text-align:center;">
+      <button class="btn btn-primary" onclick="startQuiz()" style="font-size:1.1rem; padding:0.9rem 2rem;">Start Quiz</button>
+    </div>
+  </div>
+
+  <!-- Quiz Screen -->
+  <div id="quizScreen" class="screen">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <div class="timer-box">
+      <span>Time Left</span>
+      <span class="timer" id="timer">60s</span>
+      <span id="qCounter">Question 1 / 50</span>
+    </div>
+    <div class="question-header">
+      <span class="topic-badge" id="topicBadge">Measurement</span>
+    </div>
+    <div class="question-text" id="questionText"></div>
+    <div class="options" id="optionsContainer"></div>
+    <div class="nav-buttons">
+      <button class="btn btn-secondary" onclick="prevQuestion()" id="prevBtn">Previous</button>
+      <button class="btn btn-primary" onclick="nextQuestion()" id="nextBtn">Next</button>
+      <button class="btn btn-success" onclick="submitQuiz()" id="submitBtn" style="display:none;">Submit Quiz</button>
+    </div>
+    <h4 style="margin-top:1.5rem;">Jump to Question</h4>
+    <div class="question-nav" id="questionNav"></div>
+  </div>
+
+  <!-- Result Screen -->
+  <div id="resultScreen" class="screen">
+    <div class="result-summary">
+      <h2>Quiz Completed!</h2>
+      <div class="score-circle" id="scoreCircle">
+        <div class="score-text" id="scoreText">0/50</div>
+      </div>
+      <p id="scoreMessage" style="font-size:1.1rem; margin:1rem 0;"></p>
+      <button class="btn btn-primary" onclick="showReview()">Review Answers</button>
+      <button class="btn btn-secondary" onclick="restartQuiz()" style="margin-left:0.5rem;">Restart</button>
+    </div>
+    <div id="reviewSection" style="display:none; margin-top:2rem;"></div>
+  </div>
+
+  <footer>Grade 7 Foundation Quiz • Self-contained • Built for practice</footer>
+</div>
+
+<script>
+const questions = [
+  {q: "The SI unit of length is:", options: ["Meter", "Kilometer", "Centimeter", "Millimeter"], answer: 0, topic: "Measurement"},
+  {q: "1 kilometer is equal to how many meters?", options: ["10", "100", "1000", "10000"], answer: 2, topic: "Measurement"},
+  {q: "The instrument used to measure mass is:", options: ["Thermometer", "Beam balance", "Speedometer", "Barometer"], answer: 1, topic: "Measurement"},
+  {q: "The SI unit of time is:", options: ["Minute", "Hour", "Second", "Day"], answer: 2, topic: "Measurement"},
+  {q: "Volume of a liquid is measured using:", options: ["Ruler", "Measuring cylinder", "Spring balance", "Stopwatch"], answer: 1, topic: "Measurement"},
+  {q: "Density is defined as:", options: ["Mass × Volume", "Mass / Volume", "Volume / Mass", "Mass + Volume"], answer: 1, topic: "Measurement"},
+  {q: "The SI unit of density is:", options: ["kg/m³", "g/cm³", "m/s", "N"], answer: 0, topic: "Measurement"},
+  {q: "A physical quantity that can be measured is called:", options: ["Unit", "Physical quantity", "Scalar", "Vector"], answer: 1, topic: "Measurement"},
+  {q: "Least count of a measuring instrument is:", options: ["Maximum measurement", "Minimum measurement it can make", "Average measurement", "Error in measurement"], answer: 1, topic: "Measurement"},
+  {q: "Area of a rectangle is calculated as:", options: ["Length + Breadth", "Length × Breadth", "Length / Breadth", "2(Length + Breadth)"], answer: 1, topic: "Measurement"},
+  {q: "1 m² is equal to how many cm²?", options: ["100", "1000", "10000", "100000"], answer: 2, topic: "Measurement"},
+  {q: "The standard unit of temperature in SI is:", options: ["Celsius", "Fahrenheit", "Kelvin", "Rankine"], answer: 2, topic: "Measurement"},
+  {q: "The actual path length covered by a body is called:", options: ["Displacement", "Distance", "Speed", "Velocity"], answer: 1, topic: "Kinematics"},
+  {q: "Displacement is a:", options: ["Scalar quantity", "Vector quantity", "Neither", "Both"], answer: 1, topic: "Kinematics"},
+  {q: "SI unit of speed is:", options: ["m/s", "km/h", "cm/s", "m/min"], answer: 0, topic: "Kinematics"},
+  {q: "If a body covers equal distances in equal intervals of time, the motion is:", options: ["Non-uniform", "Uniform", "Accelerated", "Circular"], answer: 1, topic: "Kinematics"},
+  {q: "Speed is the ratio of:", options: ["Distance / Time", "Time / Distance", "Displacement / Time", "Acceleration / Time"], answer: 0, topic: "Kinematics"},
+  {q: "Velocity is:", options: ["Speed with direction", "Distance with direction", "Only magnitude", "None"], answer: 0, topic: "Kinematics"},
+  {q: "A body is said to be in motion if it:", options: ["Does not change position", "Changes its position with time", "Is at rest", "Has zero speed"], answer: 1, topic: "Kinematics"},
+  {q: "Average speed is:", options: ["Total distance / Total time", "Instantaneous speed", "Final speed - initial speed", "None"], answer: 0, topic: "Kinematics"},
+  {q: "The slope of distance-time graph gives:", options: ["Acceleration", "Speed", "Velocity", "Displacement"], answer: 1, topic: "Kinematics"},
+  {q: "If velocity-time graph is a straight line parallel to time axis, the motion is:", options: ["Accelerated", "Uniform velocity", "Retarded", "Non-uniform"], answer: 1, topic: "Kinematics"},
+  {q: "Acceleration is rate of change of:", options: ["Distance", "Speed", "Velocity", "Time"], answer: 2, topic: "Kinematics"},
+  {q: "SI unit of acceleration is:", options: ["m/s", "m/s²", "km/h", "m/min²"], answer: 1, topic: "Kinematics"},
+  {q: "A car travels 60 km in 2 hours. Its average speed is:", options: ["30 km/h", "60 km/h", "120 km/h", "20 km/h"], answer: 0, topic: "Kinematics"},
+  {q: "When a body returns to its starting point, its displacement is:", options: ["Maximum", "Zero", "Equal to distance", "Negative"], answer: 1, topic: "Kinematics"},
+  {q: "The device used to measure speed of a vehicle is:", options: ["Odometer", "Speedometer", "Thermometer", "Barometer"], answer: 1, topic: "Kinematics"},
+  {q: "In circular motion, the direction of velocity is:", options: ["Constant", "Towards center", "Tangential", "None"], answer: 2, topic: "Kinematics"},
+  {q: "Heat is a form of:", options: ["Energy", "Matter", "Force", "Power"], answer: 0, topic: "Heat"},
+  {q: "Temperature is measured by:", options: ["Barometer", "Thermometer", "Speedometer", "Ammeter"], answer: 1, topic: "Heat"},
+  {q: "Heat always flows from:", options: ["Cold to hot body", "Hot to cold body", "Equal temperature", "None"], answer: 1, topic: "Heat"},
+  {q: "The process of heat transfer in solids is mainly:", options: ["Convection", "Conduction", "Radiation", "Evaporation"], answer: 1, topic: "Heat"},
+  {q: "Sea breeze occurs during:", options: ["Day", "Night", "Both", "None"], answer: 0, topic: "Heat"},
+  {q: "Land breeze occurs during:", options: ["Day", "Night", "Both", "None"], answer: 1, topic: "Heat"},
+  {q: "The SI unit of heat is:", options: ["Calorie", "Joule", "Kelvin", "Watt"], answer: 1, topic: "Heat"},
+  {q: "When a solid is heated, it:", options: ["Contracts", "Expands", "Remains same", "Melts only"], answer: 1, topic: "Heat"},
+  {q: "Clinical thermometer is used to measure:", options: ["Room temperature", "Body temperature", "Water temperature", "Air temperature"], answer: 1, topic: "Heat"},
+  {q: "The normal body temperature of a healthy person is:", options: ["37°C", "98.6°C", "100°C", "0°C"], answer: 0, topic: "Heat"},
+  {q: "Black objects absorb heat:", options: ["Less", "More", "Same", "None"], answer: 1, topic: "Heat"},
+  {q: "Thermos flask prevents heat loss by:", options: ["Conduction and convection only", "Radiation only", "All three modes", "None"], answer: 2, topic: "Heat"},
+  {q: "Light travels in:", options: ["Curved lines", "Straight lines", "Zigzag", "Circular"], answer: 1, topic: "Light"},
+  {q: "The phenomenon of bouncing back of light is called:", options: ["Refraction", "Reflection", "Dispersion", "Diffraction"], answer: 1, topic: "Light"},
+  {q: "The angle of incidence is equal to the angle of reflection. This is the law of:", options: ["Refraction", "Reflection", "Conservation", "None"], answer: 1, topic: "Light"},
+  {q: "A plane mirror forms a virtual image that is:", options: ["Erect and same size", "Inverted and same size", "Erect and magnified", "Inverted and diminished"], answer: 0, topic: "Light"},
+  {q: "Lateral inversion is observed in:", options: ["Plane mirror", "Convex lens", "Concave mirror", "Prism"], answer: 0, topic: "Light"},
+  {q: "The splitting of white light into seven colors is called:", options: ["Reflection", "Refraction", "Dispersion", "Scattering"], answer: 2, topic: "Light"},
+  {q: "Rainbow is formed due to:", options: ["Reflection only", "Refraction and dispersion", "Diffraction", "None"], answer: 1, topic: "Light"},
+  {q: "The lens that converges light rays is:", options: ["Concave lens", "Convex lens", "Plane mirror", "None"], answer: 1, topic: "Light"},
+  {q: "Shadows are formed because light travels in:", options: ["Straight lines", "Curved paths", "All directions equally", "None"], answer: 0, topic: "Light"},
+  {q: "The image formed by a convex lens can be:", options: ["Only real", "Only virtual", "Real or virtual", "Always inverted"], answer: 2, topic: "Light"}
+];
+
+let currentQ = 0;
+let answers = new Array(questions.length).fill(null);
+let timerInterval;
+let timeLeft = 60;
+let quizStarted = false;
+
+function startQuiz() {
+  quizStarted = true;
+  currentQ = 0;
+  answers.fill(null);
+  document.getElementById('startScreen').classList.remove('active');
+  document.getElementById('quizScreen').classList.add('active');
+  document.getElementById('resultScreen').classList.remove('active');
+  buildQuestionNav();
+  loadQuestion();
+}
+
+function buildQuestionNav() {
+  const nav = document.getElementById('questionNav');
+  nav.innerHTML = '';
+  questions.forEach((_, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'q-btn';
+    btn.textContent = i + 1;
+    btn.onclick = () => goToQuestion(i);
+    nav.appendChild(btn);
+  });
+}
+
+function updateNav() {
+  const btns = document.querySelectorAll('.q-btn');
+  btns.forEach((btn, i) => {
+    btn.className = 'q-btn';
+    if (i === currentQ) btn.classList.add('current');
+    else if (answers[i] !== null) btn.classList.add('answered');
+  });
+}
+
+function loadQuestion() {
+  clearInterval(timerInterval);
+  timeLeft = 60;
+  updateTimer();
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimer();
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      if (answers[currentQ] === null) answers[currentQ] = -1;
+      nextQuestion(true);
+    }
+  }, 1000);
+
+  const q = questions[currentQ];
+  document.getElementById('questionText').textContent = q.q;
+  document.getElementById('topicBadge').textContent = q.topic;
+  document.getElementById('qCounter').textContent = `Question ${currentQ + 1} / ${questions.length}`;
+  document.getElementById('progressFill').style.width = `${((currentQ + 1) / questions.length) * 100}%`;
+
+  const container = document.getElementById('optionsContainer');
+  container.innerHTML = '';
+  q.options.forEach((opt, idx) => {
+    const div = document.createElement('button');
+    div.className = 'option';
+    div.textContent = `${String.fromCharCode(65 + idx)}. ${opt}`;
+    if (answers[currentQ] === idx) div.classList.add('selected');
+    div.onclick = () => selectOption(idx, div);
+    container.appendChild(div);
+  });
+
+  document.getElementById('prevBtn').disabled = currentQ === 0;
+  document.getElementById('nextBtn').style.display = currentQ === questions.length - 1 ? 'none' : 'inline-block';
+  document.getElementById('submitBtn').style.display = currentQ === questions.length - 1 ? 'inline-block' : 'none';
+  updateNav();
+}
+
+function updateTimer() {
+  const el = document.getElementById('timer');
+  el.textContent = timeLeft + 's';
+  el.className = 'timer' + (timeLeft <= 10 ? ' warning' : '');
+}
+
+function selectOption(idx, el) {
+  answers[currentQ] = idx;
+  document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  updateNav();
+}
+
+function goToQuestion(idx) {
+  if (idx < 0 || idx >= questions.length) return;
+  currentQ = idx;
+  loadQuestion();
+}
+
+function prevQuestion() {
+  if (currentQ > 0) goToQuestion(currentQ - 1);
+}
+
+function nextQuestion(auto = false) {
+  if (currentQ < questions.length - 1) {
+    goToQuestion(currentQ + 1);
+  } else if (!auto) {
+    submitQuiz();
+  }
+}
+
+function submitQuiz() {
+  clearInterval(timerInterval);
+  let score = 0;
+  answers.forEach((a, i) => {
+    if (a === questions[i].answer) score++;
+  });
+  const pct = Math.round((score / questions.length) * 100);
+  document.getElementById('quizScreen').classList.remove('active');
+  document.getElementById('resultScreen').classList.add('active');
+  document.getElementById('scoreText').textContent = `${score}/${questions.length}`;
+  document.getElementById('scoreCircle').style.setProperty('--score', pct);
+  let msg = pct >= 80 ? 'Excellent! Strong foundation.' : pct >= 60 ? 'Good job! Keep practicing.' : 'Keep revising the concepts.';
+  document.getElementById('scoreMessage').textContent = msg + ` (${pct}%)`;
+  document.getElementById('reviewSection').style.display = 'none';
+}
+
+function showReview() {
+  const section = document.getElementById('reviewSection');
+  section.style.display = 'block';
+  section.innerHTML = '<h3>Review</h3>';
+  questions.forEach((q, i) => {
+    const correct = answers[i] === q.answer;
+    const div = document.createElement('div');
+    div.className = 'review-item ' + (correct ? 'correct' : 'incorrect');
+    const userAns = answers[i] === null || answers[i] === -1 ? 'Not answered' : q.options[answers[i]];
+    const correctAns = q.options[q.answer];
+    div.innerHTML = `<strong>Q${i+1} (${q.topic}):</strong> ${q.q}<br>
+      Your answer: ${userAns}<br>
+      Correct answer: ${correctAns}`;
+    section.appendChild(div);
+  });
+  section.scrollIntoView({behavior: 'smooth'});
+}
+
+function restartQuiz() {
+  document.getElementById('resultScreen').classList.remove('active');
+  document.getElementById('startScreen').classList.add('active');
+  quizStarted = false;
+}
+
+document.addEventListener('keydown', (e) => {
+  if (!quizStarted) return;
+  if (e.key === 'ArrowRight' || e.key === 'n') nextQuestion();
+  if (e.key === 'ArrowLeft' || e.key === 'p') prevQuestion();
+  if (e.key >= '1' && e.key <= '4') {
+    const idx = parseInt(e.key) - 1;
+    const opts = document.querySelectorAll('.option');
+    if (opts[idx]) selectOption(idx, opts[idx]);
+  }
+});
+</script>
+</body>
+</html>
